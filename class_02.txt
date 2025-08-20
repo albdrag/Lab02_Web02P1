@@ -1,0 +1,414 @@
+===============================================================================================
+Institute....: Universidad Técnica Nacional
+Campus.......: Pacífico
+Career.......: Tecnologías de Información
+Course.......: ITI-621 - Tecnología y Sistemas WEB III
+Period.......: 2-2025
+Document.....: 02_Read and procession csv fiile.txt
+Goals........: Load and read of the content from csv file
+				- Sending data across the components
+				- Use table to visualize data
+Professor....: Jorge Ruiz (york)
+Student......:
+===============================================================================================
+
+Step 01 - Create new project directory 
+
+	- Using powerShell (as single user), open your work directory:
+	
+		cd web_02 (eg)	
+
+		npx create-vite@latest class_02
+		
+			- Select React and press [Enter]
+			- Select TypeScript and press [Enter]
+			
+			
+		cd class_02
+		
+		- Install the node_modules
+		npm install	
+			
+			
+		- Install required libraries (visual design)	
+		npm install @mui/material @emotion/react @emotion/styled
+		npm install @mui/icons-material
+		
+		
+		- Install required library to navigate across the components (web pages)
+		npm install react-router-dom
+		
+		
+		- Install required library to manage the form behavior
+		npm install react-hook-form
+		
+		
+		- Install required library to process .csv file
+		npm install react-papaparse
+		
+		
+		- Install required library to visualize data in table format
+		npm install react-data-table-component
+		
+
+	- Open the new project directory with your favorite IDE (visual code)
+	
+	
+Step 02 - Change the app behavior
+
+	- Change network configuration:
+	
+		- Open <root_project>/package.json
+	
+		- Search "scripts" section and update variable:
+	
+			"dev": "vite --host"
+			
+	
+	- Accept the 'any' data type:
+	
+		- Open <root_project>/eslint.config.js
+		
+		- Search "rules" section and add the next instruction:
+		
+			"@typescript-eslint/no-explicit-any": "off",
+		
+		
+	- Save changes
+
+
+Step 03 - Update the React project
+
+	- Delete files unnecesaries
+	
+		- In the <root_project>/src directory, delete the next files:
+		
+			- App.css
+			
+			
+	- Open <root_project>/src/index.css
+
+		- Delete all code and writes:
+		
+			body {
+			  margin: 0;
+			  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+				'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+				sans-serif;
+			  -webkit-font-smoothing: antialiased;
+			  -moz-osx-font-smoothing: grayscale;
+
+			  background-color: #282c34;
+			  color: white;
+			}			
+			
+		- Save changes
+	
+	
+	- Open <root_project>/src/App.tsx
+	
+		- Delete all code and writes:
+		
+			import { useForm } from 'react-hook-form';
+			import { Container, Grid, Paper, Typography } from '@mui/material';
+
+			interface FormData {
+				txtArchi: string[];
+			}
+
+			const App = () => {
+				const { register, handleSubmit } = useForm<FormData>();
+				
+				const onSubmit = (data: FormData) => {
+					console.log('Datos del formulario:', data.txtArchi[0]);
+				};
+
+				return (
+					<Container maxWidth="sm" style={{ maxWidth: 'md', marginTop: '15px' }}>
+						<Paper elevation={3} style={{ padding: '5px' }}>
+							<Grid container alignItems="center" direction="column" spacing={2} style={{ padding: '5px' }}>
+								<Typography variant="h5">Lectura de archivos csv</Typography>
+								<form onSubmit={handleSubmit(onSubmit)} style={{ width: '100%' }}>
+									<Grid container spacing={2} direction="column">
+										<Grid>
+											<input
+												{...register('txtArchi', { required: true })}
+												type="file"
+												style={{ width: '100%', padding: '5px', fontSize: '13px' }}
+											/>
+										</Grid>
+										<Grid>
+											<button type="submit" style={{ padding: '10px 15px', fontSize: '13px' }}>
+												Procesar
+											</button>
+										</Grid>
+									</Grid>
+								</form>
+							</Grid>
+						</Paper>
+					</Container>
+				);
+			};
+
+			export default App;
+
+
+		- Save changes
+		
+
+Step 04 - Update index.html with boostrap libraries
+
+	- Open <root_project>/index.html
+	
+		- In the head section (before a title tag) writes:
+
+			<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+				  rel="stylesheet"
+				  integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" 
+				  crossorigin="anonymous">
+				  
+				  
+		- In the body section, at the end, writes:
+		
+			<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+				    integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
+				    crossorigin="anonymous"></script>
+
+	- Save changes
+
+
+Step 05 - Update main component
+
+	- Open <root_project>/src/main.tsx
+	
+		- Delete all code and writes:
+					
+			import ReactDOM from 'react-dom/client';
+			import { BrowserRouter, Routes, Route } from 'react-router-dom'
+
+			import './index.css'
+			import App from './App.tsx'
+
+			const root = ReactDOM.createRoot(
+				document.getElementById('root') as HTMLElement
+			);
+
+			root.render(
+				<BrowserRouter>
+					<Routes>
+						<Route path="/" element={<App />} />
+					</Routes>
+				</BrowserRouter>
+			);
+
+			
+		- Save changes	
+
+		
+Step 06 - Test changes (first time)
+
+	- Open the window terminal into Visual Code or your favorite IDE
+			
+		- Then execute the next command
+
+			npm run dev		
+			
+			- You can see the next message:
+		
+				Compiled successfully!                           
+
+				You can now view web_02 in the browser.          
+
+				  ➜  Local:   http://localhost:5173/
+				  ➜  Network: http://10.236.2.142:5173/			  
+
+
+			- Download the datos.zip from University Virtual Campus and
+			  extract content
+			  
+			- Open file datos.csv with yours new web app and review console log
+			  with web browser development tools
+
+
+		- Be happy...!		
+		
+
+Step 07 - Reading the csv file content
+
+	- Open the <root_project>/src/App.tsx
+	
+		- Add library reference:
+		
+			import { usePapaParse } from 'react-papaparse';
+			
+			
+		- Between the "const App = () => {" line and 
+		  "const onSubmit = (data: FormData) => {" line, writes:
+				
+			const parse:any = usePapaParse();
+					
+					
+		- Update the onSubmit function:
+		
+			- Delete the next instruction:
+			
+				console.log('Datos del formulario:', data.txtArchi[0]);
+				
+			- Replace with:
+
+				const archivo:any = data.txtArchi[0];
+
+				parse.readString(archivo, {
+					delimiter: ';',
+					header: false,
+					dynamicTyping: true,
+					complete: (result:any) => {
+						console.log('Datos procesados:', result.data);
+					},
+				});
+				
+	- Save changes
+
+	- Execute again the next command
+
+			npm run dev
+			
+		and review console log with web browser development tools
+		
+	- Be happy...!
+
+
+Step 08 - Processing data
+
+	- Into the <root_project>/src folder, creates a new folder called pages
+	
+	- Into the <root_project>/src/pages folder, creates a new files called procesar.tsx
+	
+	- Open the new file "procesar.tsx" and writes:
+	
+		import { useLocation } from 'react-router-dom';
+		import DataTable from "react-data-table-component";
+
+		const Procesar = () => {
+			const location = useLocation();
+			const contenido = location.state ? location.state.contenido : null;
+
+			const columns = contenido[0].map((item: any) => {
+				return {
+					name: item,
+					selector: (row: any) => row[item],
+					sortable: true,
+				}
+			});
+
+			const data = [contenido.slice(1, 50).map((row: any) => {
+				const obj: any = {};
+				for(let i = 0; i < row.length; i++){
+					obj[columns[i].name] = row[i];
+				}
+				return obj;
+			})];
+
+			const customStyle = {
+				rows: {
+					style: {
+						minHeight: '50px', // override the row height
+					},
+				},
+				headCells: {
+					style: {
+						paddingLeft: '8px', // override the cell padding for head cells
+						paddingRight: '8px',
+						fontSize: '14px',
+					},
+				},
+				cells: {
+					style: {
+						paddingLeft: '8px', // override the cell padding for data cells
+						paddingRight: '8px',
+						fontSize: '14px',
+					},
+				},
+			};
+
+			return (
+				<div>
+					<h4>Contenido del archivo</h4>
+					<br/>
+					<h5>Estrucutra de datos</h5>
+					<table className="table table-striped">
+						<thead>
+						<tr>
+							{contenido[0].map((item: any, index: number) => <th key={index}>{item}</th>)}
+						</tr>
+						</thead>
+						<tbody>
+						<tr>
+							{contenido[1].map((item: any, index: number) => <td key={index}>{typeof item}</td>)}
+						</tr>
+						</tbody>
+					</table>
+
+					<br/>
+					<h5>Conjunto de datos con DataTable</h5>
+					<DataTable
+						columns={columns}
+						data={data[0]}
+						pagination
+						selectableRows
+						customStyles={customStyle}
+					/>
+				</div>
+			)
+		}
+
+		export default Procesar;
+	
+	
+	- Save changes
+	
+
+Step 09 - Update main component again
+
+	- Open <root_project>/src/main.tsx	
+	
+		- Add import:
+		
+			import Procesar from './pages/procesar.tsx'
+			
+			
+		- Add route in Routes section (after root end point):
+		
+			<Route path="/procesar" element={<Procesar />} />
+			
+	- Save changes
+
+	
+Step 10 - Call the procesar component, sending data
+	
+	- Open the <root_project>/src/App.tsx
+	
+		- Add import:
+		
+			import {useNavigate} from 'react-router-dom';
+			
+			
+		- Add const into the App render:
+
+			const navigate = useNavigate()
+			
+			
+		- Call procesar component into complete section, after console.log:
+
+			navigate('/procesar', {state: {contenido: result.data}});
+			
+			
+	- Save changes
+
+	- Execute again the next command
+
+		npm run dev
+			
+	and review the procesar component
+		
+	- Be happy...!
