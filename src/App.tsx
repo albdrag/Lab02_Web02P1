@@ -1,78 +1,91 @@
-import React from "react";
-import { useForm } from "react-hook-form";
-import { Container, Paper, Typography, Button, TextField, Grid } from "@mui/material";
+// App.tsx
+import React, { useState } from "react";
 import { usePapaParse } from "react-papaparse";
 import { useNavigate } from "react-router-dom";
-
-interface FormData {
-  txtArchi: FileList;
-  delimiter: string;
-}
+import { Container, Paper, Typography, Button, TextField, FormControlLabel, Checkbox } from "@mui/material";
 
 const App: React.FC = () => {
-  const { register, handleSubmit } = useForm<FormData>();
   const { readString } = usePapaParse();
   const navigate = useNavigate();
 
-  const onSubmit = (data: FormData) => {
-    if (!data.txtArchi || data.txtArchi.length === 0) return;
+  const [file, setFile] = useState<File | null>(null);
+  const [delimiter, setDelimiter] = useState(";");
+  const [hasHeader, setHasHeader] = useState(true);
 
-    const archivo = data.txtArchi[0];
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files.length > 0) {
+      setFile(e.target.files[0]);
+    }
+  };
+
+  const handleSubmit = () => {
+    if (!file) return;
+
     const reader = new FileReader();
-
     reader.onload = (e) => {
       const csv = e.target?.result as string;
-      const delimiter = data.delimiter || ";";
 
       readString(csv, {
-        delimiter,
-        header: false,
+        delimiter: delimiter,
+        header: hasHeader,
         dynamicTyping: true,
         complete: (result: any) => {
-          console.log("Datos procesados:", result.data);
-          navigate("/procesar", { state: { contenido: result.data } });
+          let data = result.data;
+
+          // Si no hay encabezado, creamos uno automático
+          if (!hasHeader) {
+            const numColumns = data[0]?.length || 0;
+            const headers = Array.from({ length: numColumns }, (_, i) => `Columna_${i + 1}`);
+            data = data.map((row: any) => {
+              const obj: any = {};
+              row.forEach((value: any, idx: number) => {
+                obj[headers[idx]] = value;
+              });
+              return obj;
+            });
+            data = [headers, ...data]; // agregamos los encabezados al inicio para Procesar.tsx
+          }
+
+          console.log("Datos procesados:", data);
+          navigate("/procesar", { state: { contenido: data } });
         },
       });
     };
 
-    reader.readAsText(archivo);
+    reader.readAsText(file);
   };
 
   return (
-    <Container maxWidth="md" style={{ marginTop: "20px" }}>
+    <Container maxWidth="sm" style={{ marginTop: "20px" }}>
       <Paper elevation={3} style={{ padding: "20px" }}>
         <Typography variant="h5" gutterBottom align="center">
           Lectura de archivos CSV
         </Typography>
 
-        <form onSubmit={handleSubmit(onSubmit)}>
-          <Grid container spacing={2} direction="column">
-            <Grid>
-              <input
-                {...register("txtArchi", { required: true })}
-                type="file"
-                accept=".csv"
-                style={{ width: "100%", padding: "5px", fontSize: "13px" }}
-              />
-            </Grid>
+        <div style={{ marginBottom: "10px" }}>
+          <input type="file" accept=".csv" onChange={handleFileChange} />
+        </div>
 
-            <Grid>
-              <TextField
-                {...register("delimiter", { required: true })}
-                label="Separador"
-                defaultValue=";"
-                inputProps={{ maxLength: 1 }}
-                fullWidth
-              />
-            </Grid>
+        <div style={{ marginBottom: "10px" }}>
+          <TextField
+            label="Separador"
+            value={delimiter}
+            onChange={(e) => setDelimiter(e.target.value)}
+            inputProps={{ maxLength: 1 }}
+            fullWidth
+          />
+        </div>
 
-            <Grid>
-              <Button type="submit" variant="contained" color="primary" fullWidth>
-                Procesar
-              </Button>
-            </Grid>
-          </Grid>
-        </form>
+        <div style={{ marginBottom: "20px" }}>
+          <FormControlLabel
+            control={<Checkbox checked={hasHeader} onChange={(e) => setHasHeader(e.target.checked)} />}
+            label="El archivo tiene encabezado"
+          />
+        </div>
+
+        <Button variant="contained" color="primary" fullWidth onClick={handleSubmit}>
+          Procesar CSV
+        </Button>
       </Paper>
     </Container>
   );
